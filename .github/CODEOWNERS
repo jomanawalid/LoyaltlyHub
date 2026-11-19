@@ -1,0 +1,50 @@
+# Each file/folder has one owner who must review PRs that change it (the LAST matching line wins).
+# Replace the handles with your real GitHub usernames.
+*                                   @habiba247668 @jomanawalid @JanaMohey
+
+/backend/shared/                    @habiba247668
+/backend/services/rewards/          @habiba247668
+/backend/tests/rewards/             @habiba247668
+/database/004_rewards.sql           @habiba247668
+/frontend/js/rewards.js             @habiba247668
+/infra/scripts/05-rewards.sh        @habiba247668
+/backend/events/rewards/            @habiba247668
+
+/backend/services/customers/        @jomanawalid
+/backend/tests/customers/           @jomanawalid
+/database/002_customers.sql         @jomanawalid
+/frontend/js/auth.js                @jomanawalid
+/frontend/js/customers.js           @jomanawalid
+/frontend/js/login-page.js          @jomanawalid
+/frontend/css/                      @jomanawalid
+/backend/events/customers/          @jomanawalid
+/backend/services/rewards/notifier.js @jomanawalid
+/backend/services/rewards/brevo.js  @jomanawalid
+/backend/tests/rewards/brevo.test.js @jomanawalid
+/infra/iam/customers-policy.json    @jomanawalid
+/infra/iam/notifier-policy.json     @jomanawalid
+/infra/iam/frontend-public-read.json @jomanawalid
+/infra/scripts/08-frontend.sh       @jomanawalid
+/tests/lib.mjs                      @jomanawalid
+/tests/integration/                 @jomanawalid
+/infra/scripts/02-cognito.sh        @jomanawalid
+/infra/scripts/03-customers.sh      @jomanawalid
+
+/backend/services/points/           @JanaMohey
+/backend/tests/points/              @JanaMohey
+/database/003_points.sql            @JanaMohey
+/frontend/js/points.js              @JanaMohey
+/infra/scripts/04-points.sh         @JanaMohey
+/infra/scripts/06-api-gateway.sh    @JanaMohey
+/infra/scripts/07-monitoring.sh     @JanaMohey
+/database/005_app_role_grants.sql   @JanaMohey
+/database/seed-10k.js               @JanaMohey
+/tests/load/                        @JanaMohey
+/backend/events/points/             @JanaMohey
+/infra/iam/points-policy.json       @JanaMohey
+/frontend/js/dashboard.js           @JanaMohey
+/backend/tests/shared/http.test.js  @JanaMohey
+/backend/scripts/build-zips.js      @JanaMohey
+/infra/scripts/deploy-all.sh        @JanaMohey
+/infra/scripts/check-deployment.sh  @JanaMohey
+/infra/scripts/destroy-all.sh       @JanaMohey

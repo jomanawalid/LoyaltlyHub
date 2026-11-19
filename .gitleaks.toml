@@ -1,0 +1,28 @@
+# gitleaks config: default rules + project-specific ones.
+# CI fails if any of these patterns appear anywhere in the git history.
+title = "LoyaltyHub secret scan"
+
+[extend]
+useDefault = true
+
+[[rules]]
+id = "neon-connection-string"
+description = "Postgres connection string with an embedded password"
+regex = '''postgres(?:ql)?://[^:\s]+:[^@\s]+@[^\s]+'''
+tags = ["database", "neon"]
+
+[[rules]]
+id = "brevo-api-key"
+description = "Brevo (Sendinblue) API key"
+regex = '''xkeysib-[a-f0-9]{64}-[A-Za-z0-9]{16}'''
+tags = ["brevo"]
+
+[allowlist]
+description = "Placeholders used in docs and examples"
+regexes = [
+  '''postgresql://USER:PASSWORD@HOST''',
+  '''postgresql://loyalty:localdevonly@localhost''',
+]
+paths = [
+  '''backend/\.env\.example''',
+]
