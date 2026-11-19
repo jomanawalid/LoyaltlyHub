@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self' http://localhost:3000 http://localhost:4566 http://*.localhost.floci.io:4566 https://*.amazonaws.com; object-src 'none'; base-uri 'self'; form-action 'self'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <title>LoyaltyHub · Sign in</title>
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="auth-page">
+  <main class="auth-card">
+    <div class="brand"><span class="brand-mark">◆</span> LoyaltyHub</div>
+    <p class="muted">Customer loyalty points for small businesses</p>
+
+    <form id="login-form" novalidate>
+      <label>E-mail <input id="email" type="email" autocomplete="username" required maxlength="254"></label>
+      <label>Password <input id="password" type="password" autocomplete="current-password" required minlength="10" maxlength="128"></label>
+      <button type="submit" class="btn primary">Sign in</button>
+    </form>
+
+    <form id="new-password-form" hidden novalidate>
+      <p>First sign-in: choose your own password (at least 10 characters, with upper case, lower case and a number).</p>
+      <label>New password <input id="new-password" type="password" autocomplete="new-password" required minlength="10" maxlength="128"></label>
+      <label>Repeat it <input id="new-password-2" type="password" autocomplete="new-password" required minlength="10" maxlength="128"></label>
+      <button type="submit" class="btn primary">Save and continue</button>
+    </form>
+
+    <p id="auth-message" class="message" role="alert"></p>
+    <p class="muted small" id="api-status">Checking API…</p>
+  </main>
+  <script src="js/env.js"></script>
+  <script type="module" src="js/login-page.js"></script>
+</body>
+</html>

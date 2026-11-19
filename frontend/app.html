@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self' http://localhost:3000 http://localhost:4566 http://*.localhost.floci.io:4566 https://*.amazonaws.com; object-src 'none'; base-uri 'self'; form-action 'self'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <title>LoyaltyHub</title>
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand"><span class="brand-mark">◆</span> LoyaltyHub</div>
+    <nav id="nav" aria-label="Main"></nav>
+    <div class="user">
+      <span id="user-email" class="muted small"></span>
+      <span id="user-role" class="badge"></span>
+      <button id="logout" class="btn ghost small">Sign out</button>
+    </div>
+  </header>
+  <main id="view" tabindex="-1"></main>
+  <div id="toast" role="status" aria-live="polite"></div>
+  <script src="js/env.js"></script>
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>
