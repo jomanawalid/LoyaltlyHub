@@ -11,11 +11,13 @@ const { createApp } = require('./shared/app-factory');
 const { registerLocalService } = require('./shared/service-client');
 const { logger } = require('./shared/logger');
 
+registerLocalService('customers', require('./services/customers/internal'));
 registerLocalService('rewards', require('./services/rewards/internal'));
 
 const app = createApp({
   serviceName: 'dev',
   routers: [
+    require('./services/customers/routes'),
     require('./services/rewards/routes'),
   ],
 });
