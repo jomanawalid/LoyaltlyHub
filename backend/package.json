@@ -1,0 +1,41 @@
+{
+  "name": "loyaltyhub-backend",
+  "version": "1.0.0",
+  "private": true,
+  "description": "LoyaltyHub API: Customers & Membership, Points & Transactions, Rewards & Redemption (Express on AWS Lambda, Neon Postgres)",
+  "main": "dev-server.js",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "dev": "node --watch dev-server.js",
+    "start": "node dev-server.js",
+    "test": "node --test \"tests/**/*.test.js\"",
+    "zip": "node scripts/build-zips.js",
+    "db:migrate": "node ../database/migrate.js",
+    "db:seed": "node ../database/migrate.js --seed",
+    "db:seed10k": "node ../database/seed-10k.js"
+  },
+  "dependencies": {
+    "@aws-sdk/client-cognito-identity-provider": "^3.1172.0",
+    "@aws-sdk/client-dynamodb": "^3.1172.0",
+    "@aws-sdk/client-lambda": "^3.1172.0",
+    "@aws-sdk/client-s3": "^3.1172.0",
+    "@aws-sdk/client-secrets-manager": "^3.1172.0",
+    "@aws-sdk/client-sqs": "^3.1172.0",
+    "@aws-sdk/lib-dynamodb": "^3.1172.0",
+    "@aws-sdk/s3-request-presigner": "^3.1172.0",
+    "@neondatabase/serverless": "^1.2.1",
+    "ajv": "^8.20.0",
+    "ajv-formats": "^3.0.1",
+    "cors": "^2.8.6",
+    "dotenv": "^17.2.0",
+    "express": "^5.2.1",
+    "helmet": "^8.3.0",
+    "pg": "^8.23.1",
+    "serverless-http": "^4.0.0"
+  },
+  "devDependencies": {
+    "archiver": "^8.0.0"
+  }
+}
