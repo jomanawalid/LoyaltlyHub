@@ -1,0 +1,26 @@
+{
+  "version": "2.0",
+  "routeKey": "POST /api/transactions",
+  "rawPath": "/api/transactions",
+  "rawQueryString": "",
+  "headers": {
+    "origin": "http://localhost:4566",
+    "content-type": "application/json",
+    "authorization": "Bearer <ID_TOKEN_FROM_COGNITO>",
+    "idempotency-key": "6f1c1c52-7c2f-4a49-9a0e-2d6a2f1b5c11"
+  },
+  "requestContext": {
+    "http": {
+      "method": "POST",
+      "path": "/api/transactions",
+      "protocol": "HTTP/1.1",
+      "sourceIp": "203.0.113.10",
+      "userAgent": "sample-event"
+    },
+    "requestId": "sample-request-id",
+    "stage": "$default",
+    "timeEpoch": 0
+  },
+  "isBase64Encoded": false,
+  "body": "{\"customerId\": \"aaaaaaaa-0000-4000-8000-00000000000a\", \"purchaseAmount\": 250}"
+}
