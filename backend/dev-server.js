@@ -12,12 +12,14 @@ const { registerLocalService } = require('./shared/service-client');
 const { logger } = require('./shared/logger');
 
 registerLocalService('customers', require('./services/customers/internal'));
+registerLocalService('points', require('./services/points/internal'));
 registerLocalService('rewards', require('./services/rewards/internal'));
 
 const app = createApp({
   serviceName: 'dev',
   routers: [
     require('./services/customers/routes'),
+        require('./services/points/routes'),
     require('./services/rewards/routes'),
   ],
 });
