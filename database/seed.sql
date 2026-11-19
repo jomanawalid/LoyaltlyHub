@@ -7,6 +7,12 @@ VALUES ('11111111-1111-4111-8111-111111111111', 'Demo Cafe'),
        ('22222222-2222-4222-8222-222222222222', 'Other Salon')   -- second tenant for isolation tests
 ON CONFLICT (business_id) DO NOTHING;
 
+-- Demo earn rule: 1 point per 1 EGP (the proposal's end-to-end scenario).
+INSERT INTO earn_rules (business_id, points_per_unit, max_purchase, daily_points_cap)
+VALUES ('11111111-1111-4111-8111-111111111111', 1, 10000, 5000),
+       ('22222222-2222-4222-8222-222222222222', 2, 5000, 3000)
+ON CONFLICT (business_id) DO NOTHING;
+
 INSERT INTO rewards (reward_id, business_id, name, description, points_cost, stock, created_by)
 VALUES
   ('aaaaaaa1-0000-4000-8000-000000000001', '11111111-1111-4111-8111-111111111111', 'Free Cappuccino', 'Any size cappuccino', 200, 50, 'seed'),
