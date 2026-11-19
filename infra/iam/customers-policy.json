@@ -1,0 +1,39 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "OwnLogsOnly",
+      "Effect": "Allow",
+      "Action": ["logs:CreateLogGroup", "logs:CreateLogStream", "logs:PutLogEvents"],
+      "Resource": "arn:aws:logs:__REGION__:__ACCOUNT__:log-group:/aws/lambda/loyalty-customers-api:*"
+    },
+    {
+      "Sid": "ReadOwnDatabaseSecretOnly",
+      "Effect": "Allow",
+      "Action": "secretsmanager:GetSecretValue",
+      "Resource": "arn:aws:secretsmanager:__REGION__:__ACCOUNT__:secret:loyalty/customers/database-url*"
+    },
+    {
+      "Sid": "ManageCustomerLoginsInOurPoolOnly",
+      "Effect": "Allow",
+      "Action": [
+        "cognito-idp:AdminCreateUser",
+        "cognito-idp:AdminAddUserToGroup",
+        "cognito-idp:AdminDeleteUser",
+        "cognito-idp:AdminDisableUser",
+        "cognito-idp:AdminEnableUser",
+        "cognito-idp:AdminUpdateUserAttributes"
+      ],
+      "Resource": "arn:aws:cognito-idp:__REGION__:__ACCOUNT__:userpool/__POOL_ID__"
+    },
+    {
+      "Sid": "CallPointsAndRewardsOnly",
+      "Effect": "Allow",
+      "Action": "lambda:InvokeFunction",
+      "Resource": [
+        "arn:aws:lambda:__REGION__:__ACCOUNT__:function:loyalty-points-api",
+        "arn:aws:lambda:__REGION__:__ACCOUNT__:function:loyalty-rewards-api"
+      ]
+    }
+  ]
+}
