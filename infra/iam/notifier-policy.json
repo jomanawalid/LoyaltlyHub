@@ -1,0 +1,35 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "OwnLogsOnly",
+      "Effect": "Allow",
+      "Action": ["logs:CreateLogGroup", "logs:CreateLogStream", "logs:PutLogEvents"],
+      "Resource": "arn:aws:logs:__REGION__:__ACCOUNT__:log-group:/aws/lambda/loyalty-email-worker:*"
+    },
+    {
+      "Sid": "ConsumeEmailQueueOnly",
+      "Effect": "Allow",
+      "Action": ["sqs:ReceiveMessage", "sqs:DeleteMessage", "sqs:GetQueueAttributes"],
+      "Resource": "arn:aws:sqs:__REGION__:__ACCOUNT__:loyalty-email-queue"
+    },
+    {
+      "Sid": "ReadRewardsDbAndBrevoKeyOnly",
+      "Effect": "Allow",
+      "Action": "secretsmanager:GetSecretValue",
+      "Resource": [
+        "arn:aws:secretsmanager:__REGION__:__ACCOUNT__:secret:loyalty/rewards/database-url*",
+        "arn:aws:secretsmanager:__REGION__:__ACCOUNT__:secret:loyalty/brevo-api-key*"
+      ]
+    },
+    {
+      "Sid": "AskCustomersForContactAndPointsForBalance",
+      "Effect": "Allow",
+      "Action": "lambda:InvokeFunction",
+      "Resource": [
+        "arn:aws:lambda:__REGION__:__ACCOUNT__:function:loyalty-customers-api",
+        "arn:aws:lambda:__REGION__:__ACCOUNT__:function:loyalty-points-api"
+      ]
+    }
+  ]
+}
