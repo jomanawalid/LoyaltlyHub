@@ -5,6 +5,7 @@ import { h } from './ui.js';
 import * as rewards from './rewards.js';
 import * as customers from './customers.js';
 import * as points from './points.js';
+import * as dashboard from './dashboard.js';
 
 const user = requireLogin();
 
@@ -15,6 +16,8 @@ const ROUTES = {
   vouchers: { label: 'Vouchers', roles: ['Customer', 'Staff', 'Owner'], render: rewards.renderRedemptions },
   points: { label: 'Points', roles: ['Staff', 'Owner', 'Customer'], render: points.renderPoints },
   settings: { label: 'Earn rules', roles: ['Staff', 'Owner'], render: points.renderEarnRules },
+    dashboard: { label: 'Dashboard', roles: ['Owner'], render: dashboard.renderDashboard },
+  reports: { label: 'Reports', roles: ['Owner'], render: dashboard.renderReports },
 };
 
 const allowed = Object.entries(ROUTES).filter(([, r]) => r.roles.includes(user.role));
