@@ -1,0 +1,38 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "OwnLogsOnly",
+      "Effect": "Allow",
+      "Action": ["logs:CreateLogGroup", "logs:CreateLogStream", "logs:PutLogEvents"],
+      "Resource": "arn:aws:logs:__REGION__:__ACCOUNT__:log-group:/aws/lambda/loyalty-rewards-api:*"
+    },
+    {
+      "Sid": "ReadOwnDatabaseSecretOnly",
+      "Effect": "Allow",
+      "Action": "secretsmanager:GetSecretValue",
+      "Resource": "arn:aws:secretsmanager:__REGION__:__ACCOUNT__:secret:loyalty/rewards/database-url*"
+    },
+    {
+      "Sid": "QueueVoucherEmailsOnly",
+      "Effect": "Allow",
+      "Action": "sqs:SendMessage",
+      "Resource": "arn:aws:sqs:__REGION__:__ACCOUNT__:loyalty-email-queue"
+    },
+    {
+      "Sid": "WriteAndReadOwnReportsOnly",
+      "Effect": "Allow",
+      "Action": ["s3:PutObject", "s3:GetObject"],
+      "Resource": "arn:aws:s3:::__REPORTS_BUCKET__/reports/*"
+    },
+    {
+      "Sid": "CallCustomersAndPointsOnly",
+      "Effect": "Allow",
+      "Action": "lambda:InvokeFunction",
+      "Resource": [
+        "arn:aws:lambda:__REGION__:__ACCOUNT__:function:loyalty-customers-api",
+        "arn:aws:lambda:__REGION__:__ACCOUNT__:function:loyalty-points-api"
+      ]
+    }
+  ]
+}
