@@ -1,0 +1,50 @@
+# CI (owner: Habiba): secret scan over the whole history, backend tests, audit, bucket guard.
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  secret-scan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0          # scan the whole history, not just the last commit
+      - uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITLEAKS_CONFIG: .gitleaks.toml
+
+  backend-tests:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: backend/package-lock.json
+      - run: npm ci
+      - run: npm test
+      - run: npm audit --omit=dev --audit-level=high
+
+  frontend-bucket-guard:
+    # The website bucket is public: make sure nothing secret ever sits in frontend/.
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Fail if frontend/ contains server files or secrets
+        run: |
+          set -e
+          if find frontend -name '.env*' -o -name '*.zip' -o -name 'package.json' | grep -q .; then
+            echo "frontend/ must only contain static website files"; exit 1
+          fi
+          if grep -RInE 'xkeysib-|postgres(ql)?://|AKIA[0-9A-Z]{16}|BEGIN (RSA|EC) PRIVATE KEY' frontend; then
+            echo "Secret-looking value found in frontend/"; exit 1
+          fi
