@@ -3,10 +3,13 @@
 import { requireLogin, signOut } from './auth.js';
 import { h } from './ui.js';
 import * as rewards from './rewards.js';
+import * as customers from './customers.js';
 
 const user = requireLogin();
 
 const ROUTES = {
+  me: { label: 'My profile', roles: ['Customer'], render: customers.renderMyProfile },
+  customers: { label: 'Customers', roles: ['Staff', 'Owner'], render: customers.renderCustomers },
   rewards: { label: 'Rewards', roles: ['Customer', 'Staff', 'Owner'], render: rewards.renderRewards },
   vouchers: { label: 'Vouchers', roles: ['Customer', 'Staff', 'Owner'], render: rewards.renderRedemptions },
 };
