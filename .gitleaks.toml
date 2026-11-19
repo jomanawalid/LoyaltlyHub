@@ -22,6 +22,7 @@ description = "Placeholders used in docs and examples"
 regexes = [
   '''postgresql://USER:PASSWORD@HOST''',
   '''postgresql://loyalty:localdevonly@localhost''',
+  '''6f1c1c52-7c2f-4a49-9a0e-2d6a2f1b5c11''',
 ]
 paths = [
   '''backend/\.env\.example''',
