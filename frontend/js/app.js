@@ -1,8 +1,10 @@
 // App shell: shared navigation for all three services, chosen by role (owner: Habiba).
 // Hiding a menu item is NOT security: the API answers 403 to any role that is not allowed.
+import { requireLogin, signOut } from './auth.js';
 import { h } from './ui.js';
 import * as rewards from './rewards.js';
 
+const user = requireLogin();
 
 const ROUTES = {
   rewards: { label: 'Rewards', roles: ['Customer', 'Staff', 'Owner'], render: rewards.renderRewards },
@@ -14,6 +16,10 @@ const home = { Owner: 'dashboard', Staff: 'customers', Customer: 'me' }[user.rol
 
 document.getElementById('user-email').textContent = user.email;
 document.getElementById('user-role').textContent = user.role;
+document.getElementById('logout').addEventListener('click', () => {
+  signOut();
+  window.location.replace('index.html');
+});
 
 const nav = document.getElementById('nav');
 for (const [key, r] of allowed) nav.append(h('a', { href: `#/${key}`, 'data-route': key }, r.label));
