@@ -1,0 +1,14 @@
+# Floci: a free local copy of AWS (Lab 7). Start it with:
+#   docker compose -f infra/floci/docker-compose.yml up -d
+# Console: http://localhost:4566/_floci/ui
+services:
+  floci:
+    image: floci/floci:latest
+    container_name: floci
+    ports:
+      - "4566:4566"
+    volumes:
+      # Lambda functions run in real Docker containers, so Floci needs the Docker socket.
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      - FLOCI_SERVICES_LAMBDA_EPHEMERAL=false
