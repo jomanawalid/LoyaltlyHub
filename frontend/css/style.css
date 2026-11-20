@@ -106,3 +106,6 @@ th { color: var(--muted); font-weight: 600; font-size: 0.8rem; text-transform: u
 #toast { visibility: hidden; position: fixed; bottom: 1.25rem; left: 50%; transform: translateX(-50%) translateY(150%); background: var(--text); color: var(--bg); padding: 0.65rem 1.1rem; border-radius: 8px; transition: transform 0.25s; max-width: 90vw; z-index: 5; }
 #toast.show { visibility: visible; transform: translateX(-50%) translateY(0); }
 #toast.error { background: var(--danger); color: #fff; }
+
+/* Elements with the hidden attribute must stay hidden (the form rules above use display:grid). */
+[hidden] { display: none !important; }
