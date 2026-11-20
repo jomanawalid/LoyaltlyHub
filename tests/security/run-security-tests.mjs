@@ -68,4 +68,71 @@ await t.test('S11', 'Injection: <script> in name rejected; SQL in search treated
 });
 
 
+// ---------- Integrity, races, errors, configuration ----------
+await t.test('S12', 'Double redemption race: 300 points, 3 parallel 200-point redemptions', 'exactly 1 x 201, balance 100', async () => {
+  const res = await Promise.all([1, 2, 3].map(() => api('POST', '/api/redemptions', { token: custA.token, body: { rewardId: reward.rewardId } })));
+  const created = res.filter((r) => r.status === 201).length;
+  const bal = await api('GET', `/api/customers/${custA.id}/balance`, { token: custA.token });
+  return { pass: created === 1 && bal.body.balance === 100, text: `${res.map((r) => r.status).join('/')} balance=${bal.body.balance}` };
+});
+
+await t.test('S13', 'Duplicate earn: same Idempotency-Key sent 3 times in parallel', 'points added once', async () => {
+  const key = uuid();
+  const before = (await api('GET', `/api/customers/${custB.id}/balance`, { token: staff })).body.balance;
+  const res = await Promise.all([1, 2, 3].map(() => api('POST', '/api/transactions', {
+    token: staff, headers: { 'Idempotency-Key': key }, body: { customerId: custB.id, purchaseAmount: 40 },
+  })));
+  const after = (await api('GET', `/api/customers/${custB.id}/balance`, { token: staff })).body.balance;
+  return { pass: after - before === 40, text: `${res.map((r) => r.status).join('/')} added=${after - before}` };
+});
+
+await t.test('S14', 'Missing Idempotency-Key on earn', '400', async () =>
+  expectStatus(await api('POST', '/api/transactions', { token: staff, body: { customerId: custB.id, purchaseAmount: 5 } }), 400));
+
+await t.test('S15', 'Error hygiene: malformed JSON + unknown route reveal no internals', '400/404, no stack or SQL', async () => {
+  const r1 = await api('POST', '/api/rewards', { token: owner, raw: '{"name": "x",' });
+  const r2 = await api('GET', `/api/customers/${uuid()}`, { token: staff });
+  const text = JSON.stringify([r1.body, r2.body]);
+  const leak = /(stack|select |insert |postgres|node_modules|at \/)/i.test(text);
+  return { pass: r1.status === 400 && r2.status === 404 && !leak, text: `${r1.status}/${r2.status} leak=${leak}` };
+});
+
+await t.test('S16', 'Voucher fraud: staff fulfils with a wrong code; staff lists show masked codes', '409 + masked', async () => {
+  const list = await api('GET', `/api/redemptions?customerId=${custA.id}`, { token: staff });
+  const red = list.body.items[0];
+  const r = await api('PATCH', `/api/redemptions/${red.redemptionId}/status`, { token: staff, body: { status: 'FULFILLED', voucherCode: 'LH-AAAA-BBBB-CC' } });
+  return { pass: r.status === 409 && red.voucherCode.startsWith('LH-****'), text: `${r.status} shown=${red.voucherCode}` };
+});
+
+await t.test('S17', 'CORS: unknown origin gets no Access-Control-Allow-Origin', 'no ACAO header', async () => {
+  const res = await fetch(`${API_URL}/api/rewards`, {
+    method: 'OPTIONS',
+    headers: { Origin: 'https://evil.example', 'Access-Control-Request-Method': 'GET' },
+  });
+  const acao = res.headers.get('access-control-allow-origin');
+  return { pass: !acao, text: `ACAO=${acao || 'none'} (CORS is browser-only; S01-S08 are the real controls)` };
+});
+
+await t.test('S18', 'Secret exposure review: repo files, API responses, public bucket', 'nothing found', async () => {
+  const root = path.join(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
+  const patterns = [/postgres(ql)?:\/\/[^\s:]+:[^@\s]+@(?!HOST)/, /xkeysib-[a-f0-9]{20,}/, /AKIA[0-9A-Z]{16}/, /BEGIN (RSA|EC) PRIVATE KEY/];
+  const hits = [];
+  const walk = (dir) => {
+    for (const e of fs.readdirSync(dir, { withFileTypes: true })) {
+      if (['node_modules', '.git', 'dist'].includes(e.name) || e.name === '.env' || e.name === '.deploy-outputs.env') continue;
+      const p = path.join(dir, e.name);
+      if (e.isDirectory()) walk(p);
+      else if (fs.statSync(p).size < 2_000_000) {
+        const text = fs.readFileSync(p, 'utf8');
+        if (patterns.some((re) => re.test(text)) && !p.endsWith('.gitleaks.toml')) hits.push(path.relative(root, p));
+      }
+    }
+  };
+  walk(root);
+  const me = await api('GET', '/api/me', { token: custA.token });
+  const responseLeak = /cognitoSub|cognito_sub|password/i.test(JSON.stringify(me.body));
+  const web = process.env.WEB_URL ? await fetch(process.env.WEB_URL.replace('index.html', '.env')) : { status: 404 };
+  return { pass: hits.length === 0 && !responseLeak && web.status !== 200, text: `files=${hits.join(',') || 'none'} responseLeak=${responseLeak} bucket/.env=${web.status}` };
+});
+
 t.finish();
