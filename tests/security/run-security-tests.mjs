@@ -36,6 +36,34 @@ const custA = await newCustomer('a', 300);
 const custB = await newCustomer('b', 0);
 const reward = (await api('POST', '/api/rewards', { token: owner, body: { name: `Sec Reward ${run}`, pointsCost: 200, stock: 10 } })).body;
 
+// ---------- Identity & roles ----------
+await t.test('S01', 'Unauthenticated: list customers with no token', '401', async () =>
+  expectStatus(await api('GET', '/api/customers'), 401));
+
+await t.test('S02', 'Tampered token: payload changed to Owner, signature kept', '401', async () => {
+  const [h, p, s] = custA.token.split('.');
+  const claims = JSON.parse(Buffer.from(p, 'base64url').toString());
+  claims['cognito:groups'] = ['Owner'];
+  const forged = `${h}.${Buffer.from(JSON.stringify(claims)).toString('base64url')}.${s}`;
+  return expectStatus(await api('GET', '/api/dashboard', { token: forged }), 401);
+});
+
+await t.test('S03', 'Garbage / unsigned token (alg none)', '401', async () => {
+  const none = `${Buffer.from('{"alg":"none"}').toString('base64url')}.${Buffer.from('{"sub":"x"}').toString('base64url')}.`;
+  const r1 = await api('GET', '/api/rewards', { token: 'abc.def.ghi' });
+  const r2 = await api('GET', '/api/rewards', { headers: { Authorization: `Bearer ${none}` } });
+  return { pass: r1.status === 401 && r2.status === 401, text: `${r1.status}/${r2.status}` };
+});
+
+await t.test('S04', 'Unauthorized role: Customer tries to register a customer', '403', async () =>
+  expectStatus(await api('POST', '/api/customers', { token: custA.token, body: { fullName: 'Hacker', email: `x${run}@x.test`, phone: '+201000000000' } }), 403));
+
+await t.test('S05', 'Unauthorized role: Staff tries to change the earn rate / void', '403', async () => {
+  const r1 = await api('PUT', '/api/earn-rules', { token: staff, body: { pointsPerUnit: 50, maxPurchase: 10000, dailyPointsCap: 5000 } });
+  const r2 = await api('POST', `/api/transactions/${uuid()}/reversals`, { token: staff, body: { reason: 'Steal points' } });
+  return { pass: r1.status === 403 && r2.status === 403, text: `${r1.status}/${r2.status}` };
+});
+
 // ---------- Ownership, tenant isolation, input validation ----------
 await t.test('S06', 'Ownership: Customer B reads Customer A balance by changing the id', '403', async () =>
   expectStatus(await api('GET', `/api/customers/${custA.id}/balance`, { token: custB.token }), 403));
