@@ -24,7 +24,17 @@ fi
 
 # Always pass the endpoint explicitly (older AWS CLI versions ignore AWS_ENDPOINT_URL for some services).
 aws() {
-  if [ -n "${AWS_ENDPOINT_URL:-}" ]; then command aws --endpoint-url "$AWS_ENDPOINT_URL" "$@"; else command aws "$@"; fi
+  local args=() a
+  for a in "$@"; do
+    if command -v cygpath >/dev/null 2>&1; then
+      case "$a" in
+        file://*|fileb://*) a="${a%%://*}://$(cygpath -m "${a#*://}")" ;;
+        /*) if [ -e "$a" ]; then a="$(cygpath -m "$a")"; fi ;;
+      esac
+    fi
+    args+=("$a")
+  done
+  if [ -n "${AWS_ENDPOINT_URL:-}" ]; then command aws --endpoint-url "$AWS_ENDPOINT_URL" "${args[@]}"; else command aws "${args[@]}"; fi
 }
 
 ACCOUNT_ID="$(aws sts get-caller-identity --query Account --output text)"
