@@ -22,6 +22,7 @@ check "CORS allows our website" "curl -s -i -X OPTIONS -H 'Origin: $FRONTEND_ORI
 check "CORS refuses evil.example" "! curl -s -i -X OPTIONS -H 'Origin: https://evil.example' -H 'Access-Control-Request-Method: POST' $API_URL/api/customers | grep -qi 'access-control-allow-origin'" "CORS_ORIGINS must not be *"
 check "Website index.html served" "[ \"\$(code $WEB_URL)\" = 200 ]" "run 08-frontend.sh"
 check "No .env in public bucket" "! aws s3 ls s3://$WEB_BUCKET --recursive | grep -Eq '\\.env|\\.zip|backend/'" "delete it and rotate the secret!"
-check "Reports bucket is private" "[ \"\$(code $PUBLIC_ENDPOINT/$REPORTS_BUCKET/)\" != 200 ] || [ -z '$PUBLIC_ENDPOINT' ]" "re-run 01-foundation.sh"
+check "Reports bucket blocks all public access" "[ \"\$(aws s3api get-public-access-block --bucket $REPORTS_BUCKET --query 'PublicAccessBlockConfiguration.[BlockPublicAcls,IgnorePublicAcls,BlockPublicPolicy,RestrictPublicBuckets]' --output text | tr -s '[:space:]' ' ' | sed 's/ *\$//')\" = 'True True True True' ]" "re-run 01-foundation.sh"
+check "Reports bucket has no public bucket policy" "! aws s3api get-bucket-policy --bucket $REPORTS_BUCKET" "remove the bucket policy"
 echo "Result: $PASS passed, $FAIL failed"
 [ "$FAIL" -eq 0 ]
