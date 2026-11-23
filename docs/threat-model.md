@@ -1,4 +1,4 @@
-# Threat model (report section 8)
+# Threat model (report section 7)
 
 Assets: customer personal data (name, e-mail, phone), points balances (they are money for the
 business), voucher codes, staff/owner accounts, database and Brevo credentials.
