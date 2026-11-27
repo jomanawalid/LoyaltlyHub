@@ -4,7 +4,11 @@
     {
       "Sid": "OwnLogsOnly",
       "Effect": "Allow",
-      "Action": ["logs:CreateLogGroup", "logs:CreateLogStream", "logs:PutLogEvents"],
+      "Action": [
+        "logs:CreateLogGroup",
+        "logs:CreateLogStream",
+        "logs:PutLogEvents"
+      ],
       "Resource": "arn:aws:logs:__REGION__:__ACCOUNT__:log-group:/aws/lambda/loyalty-points-api:*"
     },
     {
@@ -16,7 +20,12 @@
     {
       "Sid": "IdempotencyTableItemsOnly",
       "Effect": "Allow",
-      "Action": ["dynamodb:GetItem", "dynamodb:PutItem", "dynamodb:UpdateItem", "dynamodb:DeleteItem"],
+      "Action": [
+        "dynamodb:GetItem",
+        "dynamodb:PutItem",
+        "dynamodb:UpdateItem",
+        "dynamodb:DeleteItem"
+      ],
       "Resource": "arn:aws:dynamodb:__REGION__:__ACCOUNT__:table/LoyaltyIdempotency"
     },
     {
@@ -24,6 +33,12 @@
       "Effect": "Allow",
       "Action": "lambda:InvokeFunction",
       "Resource": "arn:aws:lambda:__REGION__:__ACCOUNT__:function:loyalty-customers-api"
+    },
+    {
+      "Sid": "PublishAlertsOnly",
+      "Effect": "Allow",
+      "Action": "sns:Publish",
+      "Resource": "arn:aws:sns:__REGION__:__ACCOUNT__:loyalty-alerts"
     }
   ]
 }

@@ -7,6 +7,7 @@ const idempotency = require('./idempotency');
 const callService = require('../../shared/service-client').serviceClient('points');
 const { conflict, notFound, badRequest } = require('../../shared/errors');
 const { logger } = require('../../shared/logger');
+const { publishAlert } = require('../../shared/alerts');
 const { ROLES, assertCustomerAccess } = require('../../shared/auth');
 
 /** Ask Customers whether the member exists and is active, and for the tier multiplier. */
@@ -111,6 +112,7 @@ async function voidTransaction(user, transactionId, { reason }) {
   const result = await repo.voidTransaction({ businessId: user.businessId, original, reason, createdBy: user.sub });
   if (!result) throw conflict('POINTS_ALREADY_SPENT', 'Balance changed during void');
   logger.security('TRANSACTION_VOIDED', { transactionId, customerId: original.customerId, points: original.pointsDelta, by: user.sub });
+  await publishAlert('TRANSACTION_VOIDED', { businessId: user.businessId, transactionId, customerId: original.customerId, by: user.sub });
   const { balance, ...transaction } = result;
   return { transaction, balance };
 }
@@ -132,6 +134,7 @@ async function adjustPoints(user, { customerId, pointsDelta, reason }) {
   });
   if (!result) throw conflict('INSUFFICIENT_POINTS', 'Balance changed during adjustment');
   logger.security('POINTS_ADJUSTED', { customerId, pointsDelta, by: user.sub });
+  await publishAlert('POINTS_ADJUSTED', { businessId: user.businessId, customerId, pointsDelta, by: user.sub });
   const { balance, ...transaction } = result;
   return { transaction, balance };
 }
@@ -151,6 +154,9 @@ async function staffActivityReport(user, days) {
   const staff = rules.flagStaff(rows);
   const flagged = staff.filter((s) => s.flags.length);
   if (flagged.length) logger.security('STAFF_ACTIVITY_FLAGGED', { count: flagged.length });
+  if (flagged.length) {
+    await publishAlert('STAFF_ACTIVITY_FLAGGED', { businessId: user.businessId, count: flagged.length, by: user.sub });
+  }
   return { days, staff };
 }
 

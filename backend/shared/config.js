@@ -60,6 +60,7 @@ const config = {
 
   idempotencyTable: process.env.IDEMPOTENCY_TABLE || 'LoyaltyIdempotency',
   emailQueueUrl: process.env.EMAIL_QUEUE_URL || '',
+  alertTopicArn: process.env.ALERT_TOPIC_ARN || '',
   reportsBucket: process.env.REPORTS_BUCKET || 'loyalty-reports-private',
   emailSender: process.env.EMAIL_SENDER || 'no-reply@loyaltyhub.example',
 
