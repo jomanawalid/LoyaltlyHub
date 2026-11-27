@@ -31,7 +31,7 @@
       "Effect": "Allow",
       "Action": "lambda:InvokeFunction",
       "Resource": [
-        "arn:aws:lambda:__REGION__:__ACCOUNT__:function:loyalty-points-api",
+        "arn:aws:lambda:__REGION__:__ACCOUNT__:function:loyalty-points-api*",
         "arn:aws:lambda:__REGION__:__ACCOUNT__:function:loyalty-rewards-api"
       ]
     }

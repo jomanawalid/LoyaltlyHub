@@ -29,10 +29,20 @@ integration_for() {   # integration_for function-name -> integration id
 }
 
 INT_CUSTOMERS="$(integration_for "$FN_CUSTOMERS")"
-INT_POINTS="$(integration_for "$FN_POINTS")"
+INT_POINTS="$(integration_for "${FN_POINTS}:live")"
 INT_REWARDS="$(integration_for "$FN_REWARDS")"
 
 EXISTING="$(aws apigatewayv2 get-routes --api-id "$API_ID" --query 'Items[].RouteKey' --output text)"
+set_route() {   # set_route "METHOD /path" integration-id: create the route, or move it to this integration
+  local rid
+  rid="$(aws apigatewayv2 get-routes --api-id "$API_ID" --query "Items[?RouteKey=='$1'].RouteId | [0]" --output text)"
+  if [ -z "$rid" ] || [ "$rid" = "None" ]; then
+    aws apigatewayv2 create-route --api-id "$API_ID" --route-key "$1" --target "integrations/$2" >/dev/null
+  else
+    aws apigatewayv2 update-route --api-id "$API_ID" --route-id "$rid" --target "integrations/$2" >/dev/null
+  fi
+  echo "   route $1 -> points alias"
+}
 add_route() {   # add_route "METHOD /path" integration-id
   if printf '%s\n' "$EXISTING" | tr '\t' '\n' | grep -qxF "$1"; then return; fi
   aws apigatewayv2 create-route --api-id "$API_ID" --route-key "$1" --target "integrations/$2" >/dev/null
@@ -54,7 +64,7 @@ for r in "POST /api/transactions" "GET /api/transactions" "GET /api/customers/{i
          "PUT /api/earn-rules" "GET /api/reports/staff-activity" \
          "OPTIONS /api/transactions" "OPTIONS /api/customers/{id}/balance" "OPTIONS /api/transactions/{id}/reversals" \
          "OPTIONS /api/adjustments" "OPTIONS /api/earn-rules" "OPTIONS /api/reports/staff-activity"; do
-  add_route "$r" "$INT_POINTS"
+  set_route "$r" "$INT_POINTS"
 done
 
 log "Routes -> Rewards & Redemption"
