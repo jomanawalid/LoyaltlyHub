@@ -21,7 +21,7 @@ ok "queue $EMAIL_QUEUE -> DLQ $EMAIL_DLQ after 3 failed attempts"
 ensure_role loyalty-rewards-role "$INFRA_DIR/iam/rewards-policy.json"
 ensure_role loyalty-email-worker-role "$INFRA_DIR/iam/notifier-policy.json"
 
-COMMON="\"NODE_ENV\":\"production\",\"CORS_ORIGINS\":\"$FRONTEND_ORIGIN\",\"COGNITO_USER_POOL_ID\":\"$COGNITO_USER_POOL_ID\",\"COGNITO_CLIENT_ID\":\"$COGNITO_CLIENT_ID\",\"COGNITO_ISSUER\":\"$COGNITO_ISSUER\",\"DB_SECRET_ID\":\"loyalty/rewards/database-url\",\"CUSTOMERS_FUNCTION\":\"$FN_CUSTOMERS\",\"POINTS_FUNCTION\":\"$FN_POINTS\""
+COMMON="\"NODE_ENV\":\"production\",\"CORS_ORIGINS\":\"$FRONTEND_ORIGIN\",\"COGNITO_USER_POOL_ID\":\"$COGNITO_USER_POOL_ID\",\"COGNITO_CLIENT_ID\":\"$COGNITO_CLIENT_ID\",\"COGNITO_ISSUER\":\"$COGNITO_ISSUER\",\"DB_SECRET_ID\":\"loyalty/rewards/database-url\",\"CUSTOMERS_FUNCTION\":\"$FN_CUSTOMERS\",\"POINTS_FUNCTION\":\"$FN_POINTS:live\""
 
 deploy_function "$FN_REWARDS" services/rewards/lambda.handler "$ROOT_DIR/backend/dist/rewards.zip" \
   loyalty-rewards-role "{\"Variables\":{$COMMON,\"SERVICE_NAME\":\"rewards\",\"EMAIL_QUEUE_URL\":\"$QUEUE_URL\",\"REPORTS_BUCKET\":\"$REPORTS_BUCKET\",\"REPORTS_PUBLIC_ENDPOINT\":\"$PUBLIC_ENDPOINT\"}}"
