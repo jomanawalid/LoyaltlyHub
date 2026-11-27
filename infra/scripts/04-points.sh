@@ -17,6 +17,10 @@ aws dynamodb update-time-to-live --table-name "$IDEMPOTENCY_TABLE" \
   --time-to-live-specification Enabled=true,AttributeName=expiresAt >/dev/null 2>&1 || true
 ok "table $IDEMPOTENCY_TABLE"
 
+log "SNS topic loyalty-alerts (Points publishes alerts here)"
+ALERT_TOPIC_ARN="$(aws sns create-topic --name loyalty-alerts --query TopicArn --output text)"
+save_output ALERT_TOPIC_ARN "$ALERT_TOPIC_ARN"
+
 ensure_role loyalty-points-role "$INFRA_DIR/iam/points-policy.json"
 
 ENV_JSON=$(cat <<JSON
@@ -26,7 +30,8 @@ ENV_JSON=$(cat <<JSON
   "COGNITO_USER_POOL_ID":"$COGNITO_USER_POOL_ID","COGNITO_CLIENT_ID":"$COGNITO_CLIENT_ID","COGNITO_ISSUER":"$COGNITO_ISSUER",
   "DB_SECRET_ID":"loyalty/points/database-url",
   "IDEMPOTENCY_TABLE":"$IDEMPOTENCY_TABLE",
-  "CUSTOMERS_FUNCTION":"$FN_CUSTOMERS"
+  "CUSTOMERS_FUNCTION":"$FN_CUSTOMERS",
+  "ALERT_TOPIC_ARN":"$ALERT_TOPIC_ARN"
 }}
 JSON
 )
