@@ -90,6 +90,7 @@ function showTemporaryPassword(target, customer, password) {
     h('p', {}, `${customer.fullName} signs in with ${customer.email} and this temporary password (valid 3 days, must be changed at first sign-in):`),
     h('p', { class: 'code' }, password),
     h('button', { class: 'btn', onclick: () => target.replaceChildren() }, 'Done, hide it')));
+    target.scrollIntoView({ behavior: 'smooth' });
 }
 
 function customerDetail(c, m, user, refresh) {
